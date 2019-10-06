@@ -3326,13 +3326,12 @@ def test_python_m_pdb_uses_pdbpp(tmphome):
     assert out.endswith("\n(Pdb++) \n")
 
 
-def get_completions(text, complete=None):
+def get_completions(text):
     """Get completions from the installed completer."""
-    if complete is None:
-        readline_ = pdb.local.GLOBAL_PDB.fancycompleter.config.readline
-        complete = readline_.get_completer()
-        assert complete.__self__ is pdb.local.GLOBAL_PDB
+    readline_ = pdb.local.GLOBAL_PDB.fancycompleter.config.readline
+    complete = readline_.get_completer()
     comps = []
+    assert complete.__self__ is pdb.local.GLOBAL_PDB
     while True:
         val = complete(text, len(comps))
         if val is None:
@@ -3535,7 +3534,14 @@ True
 class TestCompleteUnit:
     def test_fancy_prefix_with_same_in_pdb(self, patched_completions):
         assert patched_completions(
-            "p foo.b", ["foo.bar"], ["foo.bar", "foo.barbaz"]
+            "p foo.b",
+            ["foo.bar"],
+            ["foo.bar", "foo.barbaz"]
+        ) == ["foo.bar"]
+        assert patched_completions(
+            "p foo.b",
+            ["foo.bar"],
+            ["foo.bar", "foo.barbaz", "foo.barbaz2"]
         ) == ["foo.bar"]
 
     def test_fancy_prefix_with_more_pdb(self, patched_completions):
@@ -3543,12 +3549,22 @@ class TestCompleteUnit:
             "p foo.b", ["foo.bar"], ["foo.bar", "foo.barbaz", "something else"]
         ) == ["foo.bar", "foo.barbaz", "something else"]
 
-    def test_fancy_with_no_pdb(self, patched_completions):
-        fancy = [
-            "\x1b[000;00m\x1b[33;01mfoo\x1b[00m",
-            "\x1b[001;00m\x1b[33;01mfoobar\x1b[00m",
-            " ",
-        ]
+    def test_fancy_with_no_pdb(self, patched_completions,
+                               fancycompleter_color_param):
+
+        if fancycompleter_color_param == "color":
+            fancy = [
+                "\x1b[000;00m\x1b[33;01mfoo\x1b[00m",
+                "\x1b[001;00m\x1b[33;01mfoobar\x1b[00m",
+                " ",
+            ]
+        else:
+            fancy = [
+                "foo",
+                "foobar",
+                " ",
+            ]
+
         assert patched_completions("foo", fancy, []) == fancy
 
     def test_fancy_tab_without_pdb(self, patched_completions):

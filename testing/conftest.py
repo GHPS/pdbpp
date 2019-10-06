@@ -153,6 +153,19 @@ def patched_completions(monkeypatch):
     return inner
 
 
+@pytest.fixture(params=("color", "nocolor"), scope="session")
+def fancycompleter_color_param(request):
+    from _pytest.monkeypatch import MonkeyPatch
+
+    m = MonkeyPatch()
+
+    if request.param == "color":
+        m.setattr("fancycompleter.DefaultConfig.use_colors", True)
+    else:
+        m.setattr("fancycompleter.DefaultConfig.use_colors", False)
+    return request.param
+
+
 @pytest.fixture
 def monkeypatch_importerror(monkeypatch):
     @contextmanager
