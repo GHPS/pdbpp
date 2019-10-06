@@ -3533,23 +3533,29 @@ True
 
 
 class TestCompleteUnit:
-    def test_fancy_prefix_with_same_in_pdb(self, monkeypatch_complete):
-        complete = monkeypatch_complete(PdbTest, {
-            "fancy": ["foo.bar"],
-            "pdb": ["foo.bar", "foo.barbaz"],
-        })
-        assert get_completions('p foo.b', complete) == [
-            "foo.bar",
-        ]
+    def test_fancy_prefix_with_same_in_pdb(self, patched_completions):
+        assert patched_completions(
+            "p foo.b", ["foo.bar"], ["foo.bar", "foo.barbaz"]
+        ) == ["foo.bar"]
 
-    def test_fancy_prefix_with_more_pdb(self, monkeypatch_complete):
-        complete = monkeypatch_complete(PdbTest, {
-            "fancy": ["foo.bar"],
-            "pdb": ["foo.bar", "foo.barbaz", "something else"],
-        })
-        assert get_completions('p foo.b', complete) == [
-            "foo.bar", "foo.barbaz", "something else",
+    def test_fancy_prefix_with_more_pdb(self, patched_completions):
+        assert patched_completions(
+            "p foo.b", ["foo.bar"], ["foo.bar", "foo.barbaz", "something else"]
+        ) == ["foo.bar", "foo.barbaz", "something else"]
+
+    def test_fancy_with_no_pdb(self, patched_completions):
+        fancy = [
+            "\x1b[000;00m\x1b[33;01mfoo\x1b[00m",
+            "\x1b[001;00m\x1b[33;01mfoobar\x1b[00m",
+            " ",
         ]
+        assert patched_completions("foo", fancy, []) == fancy
+
+    def test_fancy_tab_without_pdb(self, patched_completions):
+        assert patched_completions("", ["\t"], []) == ["\t"]
+
+    def test_fancy_tab_with_pdb(self, patched_completions):
+        assert patched_completions("", ["\t"], ["help"]) == ["help"]
 
 
 def test_complete_uses_attributes_only_from_orig_pdb(
