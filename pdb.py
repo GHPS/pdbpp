@@ -516,6 +516,8 @@ class Pdb(pdb.Pdb, ConfigurableClass, object):
                         for x in pdb_completions
                     ]
                 if len(completions) == 1 and "." in completions[0]:
+                    if pdb_prefix:
+                        pdb_completions = []
 
                 for x in pdb_completions:
                     if x not in clean_fancy_completions:
