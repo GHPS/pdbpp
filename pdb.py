@@ -514,15 +514,15 @@ class Pdb(pdb.Pdb, ConfigurableClass, object):
                         self._completions = completions
                 else:
                     self._completions = completions
-                    if pdb_prefix and len(pdb_completions) > 1:
-                        if '.' in text:
-                            dotted = text.split('.')
-                            prefix = '.'.join(dotted[:-1]) + '.'
-                            prefix_len = len(prefix)
-                            pdb_completions = [
-                                x[prefix_len:] if x.startswith(prefix) else x
-                                for x in pdb_completions
-                            ]
+                    if '.' in text and pdb_prefix and len(pdb_completions) > 1:
+                        # Remove prefix for attr_matches from pdb completions.
+                        dotted = text.split('.')
+                        prefix = '.'.join(dotted[:-1]) + '.'
+                        prefix_len = len(prefix)
+                        pdb_completions = [
+                            x[prefix_len:] if x.startswith(prefix) else x
+                            for x in pdb_completions
+                        ]
 
                     for x in pdb_completions:
                         if x not in clean_fancy_completions:
