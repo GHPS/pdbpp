@@ -3463,6 +3463,7 @@ def test_complete_removes_duplicates_with_coloring(
 ):
     def fn():
         helpvar = 42  # noqa: F841
+
         class obj:
             foo = 1
             foobar = 2
