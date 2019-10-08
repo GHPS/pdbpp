@@ -3564,8 +3564,22 @@ class TestCompleteUnit:
                 "foobar",
                 " ",
             ]
-
         assert patched_completions("foo", fancy, []) == fancy
+
+    def test_fancy_with_prefixed_pdb(self, patched_completions):
+        assert patched_completions("sys.version", [
+            "version",
+            "version_info",
+            " ",
+        ], [
+            "sys.version",
+            "sys.version_info",
+        ]) == ["version", "version_info", " "]
+
+    def test_fancy_with_prefixed_pdb_other_text(self, patched_completions):
+        fancy = ["version", "version_info"]
+        pdb = ["sys.version", "sys.version_info"]
+        assert patched_completions("xxx", fancy, pdb) == fancy + pdb
 
     def test_fancy_tab_without_pdb(self, patched_completions):
         assert patched_completions("", ["\t"], []) == ["\t"]

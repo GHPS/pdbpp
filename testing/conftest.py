@@ -136,8 +136,8 @@ def patched_completions(monkeypatch):
 
         def _get_comps(complete, text):
             if isinstance(complete.__self__, fancycompleter.Completer):
-                return fancy_comps
-            return pdb_comps
+                return fancy_comps[:]
+            return pdb_comps[:]
 
         monkeypatch.setattr(_pdb, "_get_all_completions", _get_comps)
         _pdb.interaction(sys._getframe(), None)
